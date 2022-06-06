@@ -1,0 +1,2 @@
+cra에서 만들어진 앱에서는 index.js파일을 시작파일로 한다.
+public index.html에서 렌더링된다.
