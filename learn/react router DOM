@@ -1,0 +1,138 @@
+SPA
+: 하나의 페이지 요청으로 전체 웹앱을 사용하는 방식 / 웹을 사용하여 모바일 앱 같은 경험을 느낌
+
+MPA
+: 서버에 미리 여러 페이지를 두고, 유저가 네비게이션 시 적합한 페이지를 전달
+: 미리 서버에서 전체 페이지를 빌드해 브라우저로 전송
+: 서버에 라우팅을 처리하는 기능이 있고, 서버에서 여러 페이지를 관리함.
+: 페이지 요청마다 모든 리소스를 다시 받아오기 때문에, 페이지 간 데이터를 재활용하기 힘듦
+
+---
+
+SPA의 특징
+- Client Side routing 기술을 활용, 페이지 진입 시 리로드없이 라우팅함
+- AJAX 기술을 활용 페이지 이동 시 서버에 데이터만 요청하여 JS로 페이지 생성
+- 여러 페이지를 앱 구성요소로 보고 여러 페이지 간의 스타일, 컴포넌트를 재활용하는 방향으로 구현
+- js만으로 전체 페이지를 만들기 때문에, 첫 요청 시 빈 페이지를 받게 됨.
+
+SPA의 장점
+- 서버에서 페이지를 만들 필요가 없기 때문에 CDN에 캐싱 가능
+- 매번 페이지 요청을 하지 않아 네트워크 요청이 줄어듬 / 데이터 요청 등을 캐싱하여 재사용할 수 있음
+- 웹사이트 개별 페이지보다 하나의 앱으로 보는 설계로 고도의 SW 설계와 패턴을 적용할 수 있음
+
+SPA의 단점
+- Search Engine Optimization에 불리함
+- 하나의 자바스크립트 앱이 지속하므로, 메모리 관리와 성능, 데이터 활용 등이 중요
+- 하나의 거대한 자바스크립트 앱을 전송받아야 하므로 코드가 많아질수록 로드 속도가 느려짐.
+
+--
+
+SPA에서의 라우팅
+- History API 혹은 url hash를 이용해 페이지 리로드 없는 페이지 전환을 구현
+- history, location 등 html5 api를 활용
+- visibilitychange, popstate, beforeunload등 window 이벤트를 활용하여 페이지 전환등의 이벤트 시 핸들러를 등록
+- react-router 등의 라이브러리를 활용하면, 라우팅 기능을 쉽게 사용할 수 있음.
+
+---
+
+react-router
+- Declarative routing for React (리액트를 위한 선언적 라우팅)
+- React의 jsx나 history api를 사용하여 라우팅을 구현
+- 웹에서는 react-router-dom을 사용
+- 적용 시 서버의 모든 path에서 같은 앱을 서빙하도록 해야 함.
+
+react-router의 기능
+- react 컴포넌트를 특정 path와 연결하면, 해당path진ㅇ비 시 컴포넌트를 렌더링하게 함
+- query,path varibale 등 url parameter를 얻어 활용함.
+- 조건에 맞지 않을 경우 redirect함.
+- 페이지 이동 시, 이벤트 핸들러를 등록함.
+- /posts/my-post-1 등의 nested route를 구현함.
+
+---
+
+react-router의 사용
+BrowserRouter로 감싸 Router Context를 제공해야 함.
+Link로 특정 페이지로 이동 시, 리로드 없이 페이지가 이동함.
+Switch로 매칭되는 라우트 하나를 렌더링하게 함.
+
+----
+
+react router 컴포넌트
+
+1. BrowserRouter
+- html5 history api를 사용하여, ui와 url의 싱크를 맞추는 역할
+- 모든 URL에 대해 동작하게 하기 위해서는 서버 설정 필요
+- 모든 PATH앞의 BASENAME을 지정할 수 있음
+- forceRefresh로, 페이지 이동시 리프레시할 것인지 지정할 수 있음
+
+2. Switch
+- 여러 Route 중 매치되는 Route 위에서부터 하나 선택하여 렌더링 함
+- 매칭되는 Route가 없으면 아무것도 보여주지 않음.
+- path='/'의 경우 모든 path에 매칭되므로 가장 아래로 내림
+
+3.Route
+- path와 컴포넌트를 매칭함
+- 매칭되는 컴포넌트는 children으로 넣어주거나, component prop으로 넘김
+- exact 키워드로 정확하게 매칭하는 path를 설정함.
+- Route 렌더링 되는 최상위 컴포넌트는 match,location,history를 prop으로 받음
+- render prop으로 매칭되었을 때 실제 어떤 컴포넌트를 렌더링할지 통제함.
+
+
+4. redirect
+- Link와 비슷하나, 렌더링되면 to prop으로 지정한 path로 이동함.
+
+5. Link
+- to prop을 특정 url로 받아, 클릭 시 내비게이션 함.
+- anchor tag를 래핑함.
+- to에 location object나 함수를 받을 수 있음.
+
+----
+
+Private Route
+ - 특정 조건이 충족되지 않았을 때 다른 페이지로 Redirect하도록 하는 기능
+ - 유저의 상세 페이지 개인정보 변경 페이지 등을 만들 때 사용됨.
+
+function PrivateRoute({component:Component,...props}) {
+    return <Route>{...props} render ={props=>{
+        const isLoggedIn = !!getUserInfo()
+        if(!isLoggedIn){
+            return <Redirect to='/login'/>
+        }
+        return <Component {...props/>
+        }}
+    }
+}
+
+----
+
+query string
+- URL의 query string 정보를 활용해 앱을 구성할 수 있음
+- URLSearchParams API를 활용함.
+
+function ContactPage(){
+    const location = useLocation();
+    const searchParams = new URLSearchParasm(location.search)
+    const email = searchParams.get('email') 
+    const address = searchParams.get('address')
+    return 
+        <div>
+            <p>{email}</p>
+            <p>{address}</p>
+        </div>
+}
+
+const params = useParams();
+const test_id = params.name
+
+
+
+const nav = useNavigate();
+
+const handleClick =() => {
+  nav("/detail", { state: info });
+}
+
+export default function DetailPage() {
+  const location = useLocation();
+  const info = location.state;
+  /*

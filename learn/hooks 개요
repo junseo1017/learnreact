@@ -1,0 +1,87 @@
+hooks
+컴포넌트에서 데이터를 관리하고 데이터가 변경될 때 상호작용 하기 위해 사용
+
+---
+
+등장 배경
+기존 컴포넌트 내에서 state와 생명주기를 관리하기 위해 반드시 클래스 컴포넌트를 사용해야 했음.
+복잡한 클래스 컴포넌트를 보완하고 함수 컴포넌트에서 클래스 컴포넌트의 기능을 구현하기 위해 추가된 것이 hook.
+
+---
+
+hook은 react 함수 내에서만 사용이 가능
+hook은 반드시 'use'로 시작해야 됨
+최상위 Level에서만 hook을 호출할 수 있음 (컴포넌트 내에서 hook을 사용할 때 반드시 첫 번째 중괄호 안에서 사용 / if,for, 콜백함수 내에서 호출 x)
+
+---
+
+State hook
+- 최초 useState가 호출될 때 초기값으로 설정되며 이후 재렌더링이 될 경우 무시됨.
+- 컴포넌트 내에서 동적인 데이터를 관리할 수 있는 hook임.
+- state는 읽기 전용이므로 직접 수정 x
+
+---
+
+effect hooks
+- 함수 컴포넌트에서 side effect를 수행할 수 있음
+- 컴포넌트가 최초로 렌더링될 때 지정한 state나 prop이 변경될 때마다 이벤트 콜백 함수가 호출
+
+useEffect(callback, deps)
+- deps : 변경을 감지할 변수들의 집합
+
+callback에 return에 함수를 넣게 되면 컴포넌트가 없어질 때 호출할 함수를 지정하게 됨. (화면에서 없어질 때)
+
+---
+
+useMemo
+- 지정한 State나 Props가 변경될 경우 해당값을 활용해 계산된 '값'을 메모이제이션하여 재렌더링 시 불필요한 연산을 줄임 (메모리를 계속해서 점유하기 때문에 성능 하락의 원인이 될 수 있음)
+- useMemo의 연산은 렌더링 단계에서 이루어지기 때문에, 오래 걸리는 로직을 작성하지 않는 것이 권장됨.
+const App = () => {
+    const [firstName, setFirstName] = useState('철수')
+    const [lastName, setLastName] = useState('김')
+
+    const fullName = useMemo(()=>{
+        return `${firstName} ${lastName}`
+        },[firstName,lastName])
+}
+
+---
+
+useCallback
+- 함수를 메모이제이션하기 위해 사용됨.
+- 컴포넌트가 재렌더링될 때 불필요하게 함수가 다시 생성되는 것을 방지함
+const callback = useCallback(()=>{},[])
+
+const App = () => {
+    const [firstName, setFirstName] = useState('철수')
+    const [lastName, setLastName] = useState('김')
+
+    const getfullName = useCallback(()=>{
+        return `${firstName} ${lastName}`
+        },[firstName,lastName])
+}
+return <>{getfullName()}</>
+
+-----
+
+useMemo에서 함수를 리턴하면 useCallback과 같은 원리로 동작함.
+useMemo(()=>fn,deps) === useCallback(fn,deps)
+----
+
+useRef
+- 컴포넌트 생애 주기 내에서 유지할 ref 객체를 반환
+- ref 객체는 .current라는 프로퍼티를 가지며 값을 자유롭게 변경할 수 있음
+- 일반적으로 React에서 DOM Element에 접근할 때 사용
+- useRef에 의해 반환된 ref객체가 변경돼도 컴포넌트가 재렌더링되지 않음. 
+
+----
+
+커스텀 훅
+자신만의 hook을 만들면 컴포넌트 로직을 함수로 뽑아내어 재사용할 수 있음.
+UI 요소의 재사용성을 올리기 위해 컴포넌트를 만드는 것처럼, 로직의 재사용성을 높이기 위해 Custom hook을 제작함
+
+- 한 로직이 여러번 사용될 경우 함수로 분리하는 것처럼 hook을 만드는 것일 뿐 새로운 개념이 아님
+- hook의 이름은 'use'로 시작해야 함
+- 한 hook 내의 state는 공유되지 않음
+
+- 커스텀 훅을 사용하려면 커스텀 훅을 호출해야 함.

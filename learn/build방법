@@ -2,7 +2,7 @@ github page를 가져와서 package.json에 homepage 추가
 
 package.json
 script
-'deploy' : 'npx gh-pages -d build' 추가하고
+'deploy' : 'npm run build && npx gh-pages -d build' 추가하고
 npm run deploy와 같이 실행할 수 있음.
 
 npx 
